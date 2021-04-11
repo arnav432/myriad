@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://thymeLeaf.org">
+<head>
+<meta charset="ISO-8859-1">
+<title>Hello world</title>
+</head>
+<body>
+<div align="center"><h1>Add new Product</h1></div>
+<form action="#" th:action="@{/add}" method="post" th:object="${product}">
+	<div align="center"><input type="text" th:field="*{productLink}" name="productLink" placeholder="Add product link here"><br></div>
+	<div align="center"><input type="submit" value="Add To List" placeholder="Add"></div>
+</form>
+<form action="#" th:action="@{/remove}" method="post" th:object="${product}">
+	<div align="center"><input type="text" th:field="*{productLink}" name="productLink" placeholder="Add product link here"><br></div>
+	<div align="center"><input type="submit" value="Remove From List" placeholder="Add"></div>
+</form>
+</body>
+</html>
