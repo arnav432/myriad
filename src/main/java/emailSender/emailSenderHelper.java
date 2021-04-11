@@ -93,7 +93,7 @@ public class emailSenderHelper {
 	}
 	
 	public static void sendStockStatusMessage(String LINK, float currentPrice) {
-		logger.info("Sending Product Stock status Message...");
+		logger.info("Sending product stock status message...");
 		Message message = new MimeMessage(session);
 		
 		try {
