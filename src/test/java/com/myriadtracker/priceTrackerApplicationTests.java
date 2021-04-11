@@ -261,7 +261,7 @@ class priceTrackerApplicationTests {
 		
 	}
 	
-	public ArrayList<Product> loadProductPriceData() throws IOException {
+	public ArrayList<Product> loadProductPriceDataV2() throws IOException {
 		logger.info("Loading product price data from csv file...");
 		BufferedReader reader = getReader();
 		String line = "";
@@ -361,7 +361,7 @@ class priceTrackerApplicationTests {
 		
 	}
 	
-	private Float beingTrackedFirstTime(Product product, float currentPrice) throws IOException {
+	private Float beingTrackedFirstTimeV2(Product product, float currentPrice) throws IOException {
 		FileWriter writer = getAppendedWriter();
 		File file = new File(productPriceDataBook);
 		product.setProductLink("https://www.flipkart.com/acer-23-8-inch-full-hd-ips-panel-monitor-ha240y/p/itmfbeg6j2gmkhfu?pid=MONFBEG6RFZ4VSA6&otracker=wishlist&lid=LSTMONFBEG6RFZ4VSA6WI2QFH&fm=organic&iid=01e86f97-e121-4ada-8c47-554700482ee6.MONFBEG6RFZ4VSA6.PRODUCTSUMMARY&ssid=yabthaizio0000001616336471504");
@@ -378,21 +378,9 @@ class priceTrackerApplicationTests {
 		writer.append(",");
 		writer.append(String.valueOf(product.getLastObservedPrice()));
 		writer.append("\n");
-		IS_FIRST_TIME = true;
 		return currentPrice;
 		
 	}
-	
-	private static void printProductList(ArrayList<Product> productList) {
-		while(true) {
-			for(Product product:productList) {
-				logger.info(product.getProductLink());
-			}
-			logger.info("--------------------------------------------------------------------------------");
-		}
-		
-	}
-	
 	
 	private static void printProductList(ArrayList<Product> productList) {
 		while(true) {
@@ -461,7 +449,7 @@ class priceTrackerApplicationTests {
 					    if(fields[1]!=null) {
 					    	counter++;
 					    	logger.info(fields[0]);
-					    	product.setLastObservedPrice(Float.parseFloat(fields[1])); 
+					    	//product.setLastObservedPrice(Float.parseFloat(fields[1])); 
 					    }
 					    if(fields.length==counter) {
 				    		continue;
@@ -469,14 +457,14 @@ class priceTrackerApplicationTests {
 						if(fields[2]!=null) {
 							counter++;
 							logger.info(fields[0]);
-							product.setMinPrice(Float.parseFloat(fields[2]));
+							//product.setMinPrice(Float.parseFloat(fields[2]));
 						}
 						if(fields.length==counter) {
 				    		continue;
 				    	}
 						if(fields[3]!=null) {
 							logger.info(fields[0]);
-							product.setMaxPrice(Float.parseFloat(fields[3]));
+							//product.setMaxPrice(Float.parseFloat(fields[3]));
 						}
 					    productList.add(product);
 					    }
@@ -526,7 +514,7 @@ class priceTrackerApplicationTests {
 		FileWriter writer = new FileWriter(file.getAbsoluteFile(),true);
 		Product product = new Product();
 		product.setProductLink(FLIPKART_LINKS[0]);
-		product.setLastObservedPrice(2000);
+		//product.setLastObservedPrice(2000);
 		writer.append(product.getProductLink());
 		writer.append(",");
 		writer.append(String.valueOf(product.getLastObservedPrice()));
