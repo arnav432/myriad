@@ -73,6 +73,7 @@ public class Displaytext {
 		}
 		logger.info("New Product added successfully. Sending confirmation message !!!");
 		sender.sendNewProductAdditionMessage(product.getProductLink());
+		backupengine.restart();
 	}
 	
 	@PostMapping("/remove")
@@ -107,6 +108,7 @@ public class Displaytext {
 		}
 		logger.info("Product deleted successfully. Sending confirmation message !!!");
 		sender.sendProductDeletionMessage(product.getProductLink());
+		backupengine.restart();
 	}
 
 }

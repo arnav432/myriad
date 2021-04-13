@@ -137,7 +137,7 @@ public class emailSenderHelper {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
 			message.setSubject("Order Tracker - product added Message");
-			message.setText("!!!!!!!!!!!!!The following product has been added!!!!!!!!!!!!!"+"\n"+productLink+"\n"+tracker.getFileSize()+" items being tracked");
+			message.setText("!!!!!!!!!!!!!The following product has been added!!!!!!!!!!!!!"+"\n"+productLink+"\n"+tracker.getFileSize()+" items being tracked"+"\n"+"Restarting !!!");
 			sendMail(message);
 		} catch (AddressException e) {
 			e.printStackTrace();
@@ -156,7 +156,7 @@ public class emailSenderHelper {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
 			message.setSubject("Order Tracker - product deleted Message");
-			message.setText("!!!!!!!!!!!!!The following product has been deleted!!!!!!!!!!!!!"+"\n"+productLink+"\n"+tracker.getFileSize()+" items being tracked");
+			message.setText("!!!!!!!!!!!!!The following product has been deleted!!!!!!!!!!!!!"+"\n"+productLink+"\n"+tracker.getFileSize()+" items being tracked"+"\n"+"Restarting !!!");
 			sendMail(message);
 		} catch (AddressException e) {
 			e.printStackTrace();

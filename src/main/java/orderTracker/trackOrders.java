@@ -167,6 +167,9 @@ public class trackOrders {
 		counter = 0;
 		for(Product product : productList) {
 			IS_FIRST_TIME = false;
+			if(product.getLastObservedPrice().isEmpty()) {
+				IS_FIRST_TIME = true;
+			}
 			restart=false;
 			counter++;
 			Document doc = null;
@@ -251,15 +254,16 @@ public class trackOrders {
 	 		}
 	 		else {
 	 			product.setLastObservedPrice(String.valueOf(currentPrice));
+	 			if(currentPrice<Float.parseFloat(product.getMinPrice())) {
+		 			product.setMinPrice(String.valueOf(currentPrice));
+		 		}
+		 		
+		 		if(currentPrice>Float.parseFloat(product.getMaxPrice())) {
+		 			product.setMaxPrice(String.valueOf(currentPrice));
+		 		}
 	 		}
 	 		
-	 		if(currentPrice<Float.parseFloat(product.getMinPrice())) {
-	 			product.setMinPrice(String.valueOf(currentPrice));
-	 		}
 	 		
-	 		if(currentPrice>Float.parseFloat(product.getMaxPrice())) {
-	 			product.setMaxPrice(String.valueOf(currentPrice));
-	 		}
 	 		
 	 		
 		}
