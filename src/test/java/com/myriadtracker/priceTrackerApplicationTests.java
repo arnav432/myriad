@@ -21,16 +21,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import javax.mail.MessagingException;
-
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.CSVParser;
 import com.opencsv.CSVParserBuilder;
@@ -40,7 +37,13 @@ import com.opencsv.CSVWriter;
 import com.opencsv.bean.*;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
-
+import org.openqa.selenium.By;
+import org.openqa.selenium.chrome.*;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import emailSender.emailSenderHelper;
 import orderTracker.trackOrders;
 import orderTrackingDatabase.Product;
@@ -73,6 +76,114 @@ class priceTrackerApplicationTests {
 
 	@Test
 	void contextLoads() {
+	}
+	
+	@Test
+	void doTasks() throws IOException, MessagingException, InterruptedException {
+		String[] valuesNotNeeded = {"COVAXIN","COVISHIELD","Booked","NA","Age 45+","Age 18+"};
+		// Create a new instance of the Firefox driver
+        // Notice that the remainder of the code relies on the interface, 
+        // not the implementation.
+		System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodriver.exe");
+        WebDriver driver = new FirefoxDriver();
+        //String response = doc.normalise().select("script#is_script").html().toString();
+        // And now use this to visit Google
+        //driver.get("http://www.google.com");
+        //driver.get("https://selfregistration.cowin.gov.in");
+        
+        
+        driver.get("https://www.cowin.gov.in/home");
+        
+        // Alternatively the same thing can be done like this
+        // driver.navigate().to("http://www.google.com");
+
+        // Find the text input element by its name
+        //WebElement element = driver.findElement(By.name("q"));
+        //WebElement element = driver.findElement(By.className("mat-input-element mat-form-field-autofill-control pintextbox ng-pristine ng-invalid cdk-text-field-autofill-monitored ng-touched"));
+        
+        WebElement element = driver.findElement(By.id("mat-input-0"));
+
+        
+
+        // Enter something to search for
+        element.sendKeys("134109");
+        
+        driver.findElement(By.className("pin-search-btn")).click();
+
+        // Now submit the form. WebDriver will find the form for us from the element
+        element.submit();
+
+        // Check the title of the page
+        //System.out.println("Page title is: " + driver.getTitle());
+        
+        List<WebElement> listOfCenters = driver.findElements(By.className("slot-available-wrap"));
+        for(WebElement center : listOfCenters) {
+        	logger.info("Center Info -> "+center.getText());
+        	String textToCheck = center.getText().toString();
+        	//logger.info("text to check->"+textToCheck);
+        	String[] valuesToBeCheckedTemp = textToCheck.split("\n");
+        	System.out.println("Size is "+valuesToBeCheckedTemp.length);
+        	int totalSize = valuesToBeCheckedTemp.length;
+        	int totalOccurences = 0;
+        	totalOccurences += (countOccurencesOf(textToCheck, "Booked"))*3;
+        	totalOccurences += countOccurencesOf(textToCheck, "NA");
+        	if((totalSize-totalOccurences)!=0) {
+        		System.out.println("!!!!!!!!!!!!  VACCINE AVAILABLE  !!!!!!!!!!!!!!!!!!!!!!!");
+        	}
+        	else {
+        		System.out.println("!!!!!!!!!!!!  VACCINE NOT AVAILABLE  !!!!!!!!!!!!!!!!!!!!!!!");
+        	}
+        	
+        	//logger.info("split text-> "+center.getText().split(" ").length);
+        	
+        }
+        //logger.info("size->"+driver.findElements(By.className("slot-available-wrap")).size());
+        //D:\geckodriver.exe
+        
+        // Google's search is rendered dynamically with JavaScript.
+        // Wait for the page to load, timeout after 10 seconds
+        (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver d) {
+            	//logger.info("->->"+d.findElement(By.className(className)));
+            	//d.findElements(By.className("center-name-title"));
+            	//d.findElements(By.className("slot-available-wrap"));
+            	String textToCheck;
+            	List<WebElement> listOfText = d.findElements(By.className("slot-available-wrap"));
+            	for(WebElement text: listOfText) {
+            		
+            	}
+            	//logger.info("text->->"+d.findElements(By.className("slot-available-wrap")).get(0).getText());
+            	//logger.info("->->"+d.findElements(By.className("center-name-title")));
+            	//logger.info("->->"+d.findElements(By.className("slot-available-wrap")));
+            	return d.getTitle().toLowerCase().startsWith("cheese!");
+            }
+        });
+
+        // Should see: "cheese! - Google Search"
+        System.out.println("Page title is: " + driver.getTitle());
+
+        //Close the browser
+        driver.quit();
+	}
+	
+	public int countOccurencesOf(String mainString, String word) {
+		// split the string by spaces in a
+	    //String a[] = mainString.split(" ");
+		System.out.println("Checking -> "+mainString);
+		String a[] = mainString.split("\n");
+		
+	    // search for pattern in a
+	    int count = 0;
+	    for (int i = 0; i < a.length; i++)
+	    {
+	    // if match found increase count
+	    if (word.equals(a[i]))
+	        count++;
+	    }
+	    
+	    System.out.println(word + " occurred " + count + " times");
+	    
+	    return count;
 	}
 	
 	@Test
@@ -554,8 +665,9 @@ class priceTrackerApplicationTests {
 	public void getResponse() throws IOException {
 		Document doc = null;
 
-		doc = Jsoup.connect("https://www.flipkart.com/acer-23-8-inch-full-hd-ips-panel-monitor-ha240y/p/itmfbeg6j2gmkhfu?pid=MONFBEG6RFZ4VSA6&otracker=wishlist&lid=LSTMONFBEG6RFZ4VSA6WI2QFH&fm=organic&iid=01e86f97-e121-4ada-8c47-554700482ee6.MONFBEG6RFZ4VSA6.PRODUCTSUMMARY&ssid=yabthaizio0000001616336471504%22").timeout((int) TIMEOUT).get();
-
+		//doc = Jsoup.connect("https://www.flipkart.com/acer-23-8-inch-full-hd-ips-panel-monitor-ha240y/p/itmfbeg6j2gmkhfu?pid=MONFBEG6RFZ4VSA6&otracker=wishlist&lid=LSTMONFBEG6RFZ4VSA6WI2QFH&fm=organic&iid=01e86f97-e121-4ada-8c47-554700482ee6.MONFBEG6RFZ4VSA6.PRODUCTSUMMARY&ssid=yabthaizio0000001616336471504%22").timeout((int) TIMEOUT).get();
+		doc = Jsoup.connect("https://selfregistration.cowin.gov.in/appointment").userAgent("Chrome/23.0.1271.95").timeout((int) TIMEOUT).get();
+		logger.info("->->"+doc.toString());
 		//String response = doc.normalise().select("script#is_script").html().toString();
 		
 		String response = doc.normalise().select("script#is_script").html().toString();

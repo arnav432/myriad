@@ -14,5 +14,8 @@
 	<div align="center"><input type="text" th:field="*{productLink}" name="productLink" placeholder="Add product link here"><br></div>
 	<div align="center"><input type="submit" value="Remove From List" placeholder="Add"></div>
 </form>
+<form action="#" th:action="@{/stop}" method="post" th:object="${product}">
+	<div align="center"><input type="submit" value="Stop Application" placeholder="Add"></div>
+</form>
 </body>
 </html>

@@ -110,5 +110,23 @@ public class Displaytext {
 		sender.sendProductDeletionMessage(product.getProductLink());
 		backupengine.restart();
 	}
+	
+	@PostMapping("/stop")
+	public void stopApplication() throws IOException, MessagingException, InterruptedException {
+		restart=false;
+		try {
+			System.exit(1);
+		} 
+		catch (Exception e) {restart=true;}
+		finally {
+			if(restart) {
+				logger.info("error while stopping application");
+				backupengine.restart();
+			}
+		}
+		logger.info("Sending stopping message !!!");
+		sender.sendApplicationStopMessage();
+		backupengine.restart();
+	}
 
 }

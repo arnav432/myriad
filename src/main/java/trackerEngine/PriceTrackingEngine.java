@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import orderTracker.trackOrders;
 import orderTrackingDatabase.Product;
+import vaccineAvailibility.CheckVaccineSlot;
 
 public class PriceTrackingEngine {
 	
@@ -21,7 +22,7 @@ public class PriceTrackingEngine {
 	
 	
 	
-	private static final long WAIT_DURATION_IN_MINUTES = 5; 
+	private static final long WAIT_DURATION_IN_MINUTES = 1; 
 	
 	private static final String LINK = "https://www.google.com/";
 	
@@ -31,6 +32,8 @@ public class PriceTrackingEngine {
 	
 	private static ArrayList<Product> productList = new ArrayList<>();
 	
+	private static CheckVaccineSlot slotChecker = new CheckVaccineSlot();
+	
 	public static void startEngine() throws IOException, MessagingException, InterruptedException {
 		
 		logger.info("Starting engine...........");
@@ -39,8 +42,9 @@ public class PriceTrackingEngine {
 		logger.info("List size is "+productList.size());
 		while(true) {
 			//tracker.trackFlipkartOrders();
-			tracker.trackFlipkartOrdersV2(productList);
+			//tracker.trackFlipkartOrdersV2(productList);
 			//tracker.trackAmazonOrders();
+			slotChecker.checkSlot();
 			logger.info("Going to sleep for "+WAIT_DURATION_IN_MINUTES+" minutes..............");
 			stayAlive();
 		}

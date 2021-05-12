@@ -166,6 +166,45 @@ public class emailSenderHelper {
 		
 	}
 	
+	public void sendVaccineAvailibilityMessage() {
+		
+		logger.info("Sending vaccine availablity message...");
+		Message message = new MimeMessage(session);
+		
+		try {
+			message.setFrom(new InternetAddress(accountEmail));
+			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
+			message.setSubject("Vaccine Slot Available");
+			message.setText("!!!!!!!!!!!!!Vaccine is available!!!!!!!!!!");
+			//message.setText("!!!!!!!!!!!!!The following product has been deleted!!!!!!!!!!!!!"+"\n"+productLink+"\n"+tracker.getFileSize()+" items being tracked"+"\n"+"Restarting !!!");
+			sendMail(message);
+		} catch (AddressException e) {
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		
+	}
+
+	
+	public void sendApplicationStopMessage() {
+		logger.info("Sending aplication stopping message...");
+		Message message = new MimeMessage(session);
+		
+		try {
+			message.setFrom(new InternetAddress(accountEmail));
+			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
+			message.setSubject("Order Tracker - application stopped");
+			message.setText("!!!!!!!!!!!!!Application has been stopped !!!");
+			sendMail(message);
+		} catch (AddressException e) {
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	private static void sendMail(Message message) {
 		try {
 			Transport.send(message);
@@ -190,8 +229,11 @@ public class emailSenderHelper {
 	}
 	
 	private static String getPassword() {
-		return "Arnav@555";
+		return "Arnav@123";
 	}
+
+	
+	
 
 	
 
