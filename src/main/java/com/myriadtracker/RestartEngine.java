@@ -17,7 +17,7 @@ public class RestartEngine {
 	@RequestMapping("/restart")
 	public void restart() throws IOException, MessagingException, InterruptedException {
 		emailSenderHelper.sendRestartMessage();
-		PriceTrackingEngine.startEngine();
+		PriceTrackingEngine.startPriceTrackingEngine();
 	}
 
 }

@@ -9,6 +9,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -31,11 +33,16 @@ public class CheckVaccineSlot {
 		int retryCount = 0;
 		
 		try {
-		
 		System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodriver.exe");
+		
+		FirefoxOptions options = new FirefoxOptions();
+		options.addArguments("--disable-popup-blocking");
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		capabilities.setCapability(FirefoxOptions.FIREFOX_OPTIONS,options);
+		
 		WebDriver driver = null;
 		try {
-			driver = new FirefoxDriver();
+			driver = new FirefoxDriver(capabilities);
 		}
 		catch(Exception e) {
 			e.printStackTrace();

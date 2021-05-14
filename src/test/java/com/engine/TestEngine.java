@@ -53,7 +53,7 @@ public class TestEngine {
 			}
 		} catch (SocketException e) {
 			logger.info("restarting engine...");
-			PriceTrackingEngine.startEngine();
+			PriceTrackingEngine.startPriceTrackingEngine();
 			e.printStackTrace();
 
 		}

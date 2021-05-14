@@ -22,6 +22,7 @@ import emailSender.emailSenderHelper;
 import orderTracker.trackOrders;
 import orderTrackingDatabase.Product;
 import orderTrackingDatabase.orderLinks;
+import trackerEngine.PriceTrackingEngine;
 
 @Controller
 public class Displaytext {
@@ -37,6 +38,8 @@ public class Displaytext {
 	static emailSenderHelper sender = new emailSenderHelper();
 	
 	ArrayList<Product> productList = new ArrayList<>();
+	
+	PriceTrackingEngine engine = new PriceTrackingEngine();
 	
 	private static boolean restart=false;
 	/*
@@ -74,6 +77,49 @@ public class Displaytext {
 		logger.info("New Product added successfully. Sending confirmation message !!!");
 		sender.sendNewProductAdditionMessage(product.getProductLink());
 		backupengine.restart();
+	}
+	
+	@PostMapping("/checkVaccine")
+	public void startCheckingVaccine(Product product) throws IOException, MessagingException, InterruptedException {
+		
+		logger.info("Starting to check slots for vaccine availibility");
+		
+		try {
+			engine.startVaccineSlotEngine();
+		} 
+		
+		catch (Exception e) {restart=true;}
+		
+		finally {
+			if(restart) {
+				logger.info("error while startng to check vaccine slots...");
+				backupengine.restart();
+			}
+		}
+		
+	}
+	
+	@PostMapping("/startTracking")
+	public void startTrackingOrder(Product product) throws IOException, MessagingException, InterruptedException {
+		
+		logger.info("Starting to track orders");
+		
+		try {
+			engine.startPriceTrackingEngine();
+		} 
+		
+		catch (Exception e) {
+			e.printStackTrace();
+			restart=true;
+			}
+		
+		finally {
+			if(restart) {
+				logger.info("error while startng to track orders...");
+				backupengine.restart();
+			}
+		}
+		
 	}
 	
 	@PostMapping("/remove")

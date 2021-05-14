@@ -167,9 +167,11 @@ public class trackOrders {
 		counter = 0;
 		for(Product product : productList) {
 			IS_FIRST_TIME = false;
-			if(product.getLastObservedPrice().isEmpty()) {
+			if(product.getLastObservedPrice() == null) {
+				logger.info("Product being tracker first time");
 				IS_FIRST_TIME = true;
 			}
+			
 			restart=false;
 			counter++;
 			Document doc = null;
@@ -181,7 +183,10 @@ public class trackOrders {
 			long start = response.indexOf("finalPrice");
 			boolean record = false;
 			String result = "";
-			
+			if( (start < 0) || (response == null) ) {
+				logger.info("Product currently unavailable, hence skipping it...");
+				continue;
+			}
 			try {
 				for(;responseArray[(int) start]!='}';start++) {
 		 			if(responseArray[(int) start]=='{') {
@@ -208,6 +213,8 @@ public class trackOrders {
 	 		String price = resultMap.get("decimalValue");
 	 		currentPrice = Float.parseFloat(price);
 	 		//logger.info("Current price is "+currentPrice);
+	 		
+	 		
 	 		try {
 	 			lastObservedPrice = !product.getLastObservedPrice().isEmpty() ? Float.parseFloat(product.getLastObservedPrice()) : currentPrice;
 	 		}
@@ -224,6 +231,7 @@ public class trackOrders {
 		 			if(!IS_FIRST_TIME) {
 		 				//sender.sendPriceDropMail(product.getProductLink(),currentPrice,lastObservedPrice);
 		 			}
+		 			restart = true;
 		 		}
 		 		catch(Exception e) {
 		 			e.printStackTrace();
@@ -272,6 +280,7 @@ public class trackOrders {
 		
 		try {
 			writePojoToCsv(productList);
+			restart = true;
 		} catch (CsvDataTypeMismatchException e) {
 			e.printStackTrace();
 			restart=false;
@@ -284,6 +293,9 @@ public class trackOrders {
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			restart=false;
+		}
+		catch(Exception e) {
+			e.printStackTrace();
 		}
 		finally {
 			if(!restart) {
