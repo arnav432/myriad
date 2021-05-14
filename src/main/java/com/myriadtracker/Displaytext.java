@@ -1,6 +1,5 @@
 package com.myriadtracker;
 
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -26,50 +25,55 @@ import trackerEngine.PriceTrackingEngine;
 
 @Controller
 public class Displaytext {
-	
+
 	static orderLinks orders = new orderLinks();
-	
+
 	static trackOrders tracker = new trackOrders();
-	
+
 	public static Logger logger = LoggerFactory.getLogger(Displaytext.class);
-	
+
 	RestartEngine backupengine = new RestartEngine();
-	
+
 	static emailSenderHelper sender = new emailSenderHelper();
-	
+
 	ArrayList<Product> productList = new ArrayList<>();
-	
+
 	PriceTrackingEngine engine = new PriceTrackingEngine();
-	
-	private static boolean restart=false;
+
+	private static boolean restart = false;
 	/*
-	@ResponseBody
-	@RequestMapping("/")
-	public String started() throws FileNotFoundException {
-		
-		return "Tracking Started. "+tracker.getFileSize()+" items are being tracked";
-	}
-	*/
-	
+	 * @ResponseBody
+	 * 
+	 * @RequestMapping("/") public String started() throws FileNotFoundException {
+	 * 
+	 * return "Tracking Started. "+tracker.getFileSize()+" items are being tracked";
+	 * }
+	 */
+
 	@RequestMapping("/")
 	public String started(Model model) {
 		Product product = new Product();
-		model.addAttribute("product",product);
+		model.addAttribute("product", product);
 		return "add";
 	}
-	
+
 	@PostMapping("/add")
 	public void addNewLink(Product product) throws IOException, MessagingException, InterruptedException {
-		logger.info("New product added ->"+product.getProductLink()+". Adding it to product file.");
+		logger.info("New product added ->" + product.getProductLink() + ". Adding it to product file.");
 		try {
 			tracker.addNewProduct(product.getProductLink());
-		} catch (CsvDataTypeMismatchException e) {restart=true;} 
-		catch (CsvRequiredFieldEmptyException e) {restart=true;} 
-		catch (IOException e) {restart=true;} 
-		catch (URISyntaxException e) {restart=true;}
-		catch (Exception e) {restart=true;}
-		finally {
-			if(restart) {
+		} catch (CsvDataTypeMismatchException e) {
+			restart = true;
+		} catch (CsvRequiredFieldEmptyException e) {
+			restart = true;
+		} catch (IOException e) {
+			restart = true;
+		} catch (URISyntaxException e) {
+			restart = true;
+		} catch (Exception e) {
+			restart = true;
+		} finally {
+			if (restart) {
 				logger.info("error while adding new product to file, restarting...");
 				backupengine.restart();
 			}
@@ -78,76 +82,84 @@ public class Displaytext {
 		sender.sendNewProductAdditionMessage(product.getProductLink());
 		backupengine.restart();
 	}
-	
+
 	@PostMapping("/checkVaccine")
 	public void startCheckingVaccine(Product product) throws IOException, MessagingException, InterruptedException {
-		
+
 		logger.info("Starting to check slots for vaccine availibility");
-		
+
 		try {
 			engine.startVaccineSlotEngine();
-		} 
-		
-		catch (Exception e) {restart=true;}
-		
+		}
+
+		catch (Exception e) {
+			restart = true;
+		}
+
 		finally {
-			if(restart) {
+			if (restart) {
 				logger.info("error while startng to check vaccine slots...");
 				backupengine.restart();
 			}
 		}
-		
+
 	}
-	
+
 	@PostMapping("/startTracking")
 	public void startTrackingOrder(Product product) throws IOException, MessagingException, InterruptedException {
-		
+
 		logger.info("Starting to track orders");
-		
+
 		try {
 			engine.startPriceTrackingEngine();
-		} 
-		
+		}
+
 		catch (Exception e) {
 			e.printStackTrace();
-			restart=true;
-			}
-		
+			restart = true;
+		}
+
 		finally {
-			if(restart) {
+			if (restart) {
 				logger.info("error while startng to track orders...");
 				backupengine.restart();
 			}
 		}
-		
+
 	}
-	
+
 	@PostMapping("/remove")
 	public void removeLink(Product product) throws IOException, MessagingException, InterruptedException {
-		logger.info("Product Link deletion request received ->"+product.getProductLink()+". preparing to delete product file.");
-		restart=false;
+		logger.info("Product Link deletion request received ->" + product.getProductLink()
+				+ ". preparing to delete product file.");
+		restart = false;
 		try {
 			productList = tracker.loadProductPriceData();
-			//Product notNeededProduct = new Product();
-			//notNeededProduct.setProductLink(product.getProductLink());
+			// Product notNeededProduct = new Product();
+			// notNeededProduct.setProductLink(product.getProductLink());
 			ArrayList<Product> FinalProductList = new ArrayList<>();
-			for(Product product2 : productList) {
-				if(!product2.getProductLink().equalsIgnoreCase(product.getProductLink())) {
+			for (Product product2 : productList) {
+				if (!product2.getProductLink().equalsIgnoreCase(product.getProductLink())) {
 					FinalProductList.add(product2);
 				}
 			}
-			
+
 			tracker.writePojoToCsv(FinalProductList);
-			for(Product product2 : FinalProductList) {
+			for (Product product2 : FinalProductList) {
 				logger.info(product2.toString());
 			}
-		} catch (CsvDataTypeMismatchException e) { restart=true;} 
-		catch (CsvRequiredFieldEmptyException e) { restart=true;} 
-		catch (IOException e) { restart=true;} 
-		catch (URISyntaxException e) { restart=true;}
-		catch (Exception e) {restart=true;}
-		finally {
-			if(restart) {
+		} catch (CsvDataTypeMismatchException e) {
+			restart = true;
+		} catch (CsvRequiredFieldEmptyException e) {
+			restart = true;
+		} catch (IOException e) {
+			restart = true;
+		} catch (URISyntaxException e) {
+			restart = true;
+		} catch (Exception e) {
+			restart = true;
+		} finally {
+			if (restart) {
 				logger.info("error while removing product from file, restarting...");
 				backupengine.restart();
 			}
@@ -156,23 +168,14 @@ public class Displaytext {
 		sender.sendProductDeletionMessage(product.getProductLink());
 		backupengine.restart();
 	}
-	
+
 	@PostMapping("/stop")
 	public void stopApplication() throws IOException, MessagingException, InterruptedException {
-		restart=false;
-		try {
-			System.exit(1);
-		} 
-		catch (Exception e) {restart=true;}
-		finally {
-			if(restart) {
-				logger.info("error while stopping application");
-				backupengine.restart();
-			}
-		}
+		restart = false;
 		logger.info("Sending stopping message !!!");
 		sender.sendApplicationStopMessage();
-		backupengine.restart();
+		System.exit(1);
+
 	}
 
 }
