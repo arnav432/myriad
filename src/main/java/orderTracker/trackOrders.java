@@ -168,7 +168,7 @@ public class trackOrders {
 		for(Product product : productList) {
 			IS_FIRST_TIME = false;
 			if(product.getLastObservedPrice() == null) {
-				logger.info("Product being tracker first time");
+				logger.info("Product being tracked first time");
 				IS_FIRST_TIME = true;
 			}
 			

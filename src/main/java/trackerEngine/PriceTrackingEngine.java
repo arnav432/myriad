@@ -40,23 +40,34 @@ public class PriceTrackingEngine {
 	private static CheckVaccineSlot slotChecker = new CheckVaccineSlot();
 	
 	private static RestartEngine restarter = new RestartEngine();
-
-
+	
+	private static boolean STOP_REQUEST = false;
+	
+	public void stopRequested() {
+		STOP_REQUEST = true;
+	}
+	
+	public void startRequested() {
+		STOP_REQUEST = false;
+	}
 	
 	public static void startPriceTrackingEngine() throws IOException, MessagingException, InterruptedException {
 		
-		logger.info("Starting engine...........");
-		trackOrders tracker = new trackOrders();
-		productList = tracker.loadProductPriceData();
-		logger.info("List size is "+productList.size());
-		while(true) {
-			//tracker.trackFlipkartOrders();
-			tracker.trackFlipkartOrdersV2(productList);
-			//tracker.trackAmazonOrders();
-			//slotChecker.checkSlot();
-			logger.info("Going to sleep for "+WAIT_DURATION_IN_MINUTES+" minutes..............");
-			stayAlive();
-		}
+			logger.info("Starting engine...........");
+			STOP_REQUEST = false;
+			trackOrders tracker = new trackOrders();
+			productList = tracker.loadProductPriceData();
+			logger.info("List size is "+productList.size());
+			while(!STOP_REQUEST) {
+				//tracker.trackFlipkartOrders();
+				tracker.trackFlipkartOrdersV2(productList);
+				//tracker.trackAmazonOrders();
+				//slotChecker.checkSlot();
+				logger.info("Going to sleep for "+WAIT_DURATION_IN_MINUTES+" minutes..............");
+				stayAlive();
+			}
+		
+		
 		
 		
 		

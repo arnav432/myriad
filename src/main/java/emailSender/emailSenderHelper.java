@@ -205,6 +205,24 @@ public class emailSenderHelper {
 		
 	}
 	
+	public void sendStopTrackingMessage() {
+		logger.info("Sending stop tracking message...");
+		Message message = new MimeMessage(session);
+		
+		try {
+			message.setFrom(new InternetAddress(accountEmail));
+			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
+			message.setSubject("Order Tracker - order tracking stopped");
+			message.setText("!!!!!!!!!!!!!Order tracking has been stopped !!!");
+			sendMail(message);
+		} catch (AddressException e) {
+			e.printStackTrace();
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 	private static void sendMail(Message message) {
 		try {
 			Transport.send(message);
@@ -231,6 +249,8 @@ public class emailSenderHelper {
 	private static String getPassword() {
 		return "Arnav@123";
 	}
+
+	
 
 	
 	

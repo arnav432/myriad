@@ -173,9 +173,40 @@ public class Displaytext {
 	public void stopApplication() throws IOException, MessagingException, InterruptedException {
 		restart = false;
 		logger.info("Sending stopping message !!!");
+		sender.sendStopTrackingMessage();
+		//System.exit(1);
+		try {
+			engine.stopRequested();
+		}
+
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@PostMapping("/restart")
+	public void restartApplication() throws IOException, MessagingException, InterruptedException {
+		restart = false;
+		logger.info("Sending restarted message !!!");
+		sender.sendRestartMessage();
+		//System.exit(1);
+		try {
+			backupengine.restart();
+		}
+
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@PostMapping("/kill")
+	public void killApplication() throws IOException, MessagingException, InterruptedException {
+		restart = false;
+		logger.info("Sending application kill message !!!");
 		sender.sendApplicationStopMessage();
 		System.exit(1);
-
+		
+		
 	}
 
 }

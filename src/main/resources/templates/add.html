@@ -18,7 +18,11 @@
 </form>
 <br>
 <form action="#" th:action="@{/stop}" method="post" th:object="${product}">
-	<div align="center"><input type="submit" value="Stop Application" placeholder="Add"></div>
+	<div align="center"><input type="submit" value="Stop Tracking" placeholder="Add"></div>
+</form>
+<br>
+<form action="#" th:action="@{/restart}" method="post" th:object="${product}">
+	<div align="center"><input type="submit" value="Restart" placeholder="Add"></div>
 </form>
 <br>
 <form action="#" th:action="@{/startTracking}" method="post" th:object="${product}">
@@ -28,6 +32,21 @@
 <form action="#" th:action="@{/checkVaccine}" method="post" th:object="${product}">
 	<div align="center"><input type="submit" value="Start Checking Vaccine Slot" placeholder="Add"></div>
 </form>
-
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<form action="#" th:action="@{/kill}" method="post" th:object="${product}">
+	<div align="center"><input type="submit" value="Kill Application" placeholder="Add"></div>
+</form>
+<br>
 </body>
 </html>
