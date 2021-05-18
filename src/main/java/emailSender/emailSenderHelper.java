@@ -37,6 +37,7 @@ public class emailSenderHelper {
 	static trackOrders tracker = new trackOrders();
 	
 	static Session session = Session.getInstance(properties, new Authenticator() {
+		
 		@Override
 		protected PasswordAuthentication getPasswordAuthentication() {
 			return new PasswordAuthentication(accountEmail, password);
@@ -57,7 +58,8 @@ public class emailSenderHelper {
 	private static Message preparePriceDropMessage(Session session, String accountEmail, String LINK,
 			float currentPrice, float lastObservedPrice) {
 		Message message = new MimeMessage(session);
-
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -77,7 +79,8 @@ public class emailSenderHelper {
 	public static void sendWelcomeMessage() throws FileNotFoundException {
 		logger.info("Sending Welcome Message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -95,7 +98,8 @@ public class emailSenderHelper {
 	public static void sendStockStatusMessage(String LINK, float currentPrice) {
 		logger.info("Sending product stock status message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -113,7 +117,8 @@ public class emailSenderHelper {
 	public static void sendRestartMessage() throws FileNotFoundException {
 		logger.info("Sending Restart Message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -132,7 +137,8 @@ public class emailSenderHelper {
 		
 		logger.info("Sending product addition message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -151,7 +157,8 @@ public class emailSenderHelper {
 		
 		logger.info("Sending product deletion message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -170,7 +177,8 @@ public class emailSenderHelper {
 		
 		logger.info("Sending vaccine availablity message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -195,7 +203,8 @@ public class emailSenderHelper {
 	public void sendApplicationStopMessage() {
 		logger.info("Sending aplication stopping message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
@@ -213,7 +222,8 @@ public class emailSenderHelper {
 	public void sendStopTrackingMessage() {
 		logger.info("Sending stop tracking message...");
 		Message message = new MimeMessage(session);
-		
+		session.getProperties().put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		session.getProperties().put("mail.smtp.starttls.enable", "true");
 		try {
 			message.setFrom(new InternetAddress(accountEmail));
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
