@@ -176,7 +176,12 @@ public class emailSenderHelper {
 			message.setRecipient(Message.RecipientType.TO, new InternetAddress(RECIPIENT));
 			message.setSubject("Vaccine Slot Available");
 			message.setText("!!!!!!!!!!!!!Vaccine is available!!!!!!!!!!");
-			//message.setText("!!!!!!!!!!!!!The following product has been deleted!!!!!!!!!!!!!"+"\n"+productLink+"\n"+tracker.getFileSize()+" items being tracked"+"\n"+"Restarting !!!");
+			sendMail(message);
+			
+			message.setFrom(new InternetAddress(accountEmail));
+			message.setRecipient(Message.RecipientType.TO, new InternetAddress("Arnav.Malhotra@lntinfotech.com"));
+			message.setSubject("Vaccine Slot Available");
+			message.setText("!!!!!!!!!!!!!Vaccine is available!!!!!!!!!!");
 			sendMail(message);
 		} catch (AddressException e) {
 			e.printStackTrace();
@@ -242,11 +247,11 @@ public class emailSenderHelper {
 		return properties;
 	}
 	
-	private static String getEmail() {
+	public static String getEmail() {
 		return "myriadprojects123@gmail.com";
 	}
 	
-	private static String getPassword() {
+	public static String getPassword() {
 		return "Arnav@123";
 	}
 

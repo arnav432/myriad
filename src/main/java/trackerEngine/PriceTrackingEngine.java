@@ -1,5 +1,6 @@
 package trackerEngine;
 
+import java.awt.AWTException;
 import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
@@ -33,7 +34,7 @@ public class PriceTrackingEngine {
 	
 	private static final long STEP_SIZE_IN_SECONDS = 5;
 
-	private static final double WAIT_DURATION_FOR_VACCINE = 0.5;
+	private static final double WAIT_DURATION_FOR_VACCINE = 0.2;
 	
 	private static ArrayList<Product> productList = new ArrayList<>();
 	
@@ -73,12 +74,13 @@ public class PriceTrackingEngine {
 		
 	}
 	
-	public static void startVaccineSlotEngine() throws IOException, MessagingException, InterruptedException {
+	public static void startVaccineSlotEngine() throws IOException, MessagingException, InterruptedException, AWTException {
 		
 		logger.info("Starting vaccine checking engine...........");
 		
 		while(true) {
-			slotChecker.checkSlot();
+			
+			slotChecker.checkSlotByDistrict();
 			
 			logger.info("Going to sleep for "+WAIT_DURATION_IN_MINUTES+" minutes..............");
 			
@@ -117,7 +119,7 @@ public class PriceTrackingEngine {
 
 	}
 	
-	public static void stayAliveForVaccine(double waitDurationForVaccine) throws IOException, MessagingException, InterruptedException {
+	public static void stayAliveForVaccine(double waitDurationForVaccine) throws IOException, MessagingException, InterruptedException, AWTException {
 		long counter = 0;
 		try {
 			for(;counter<=(waitDurationForVaccine*60);counter+=STEP_SIZE_IN_SECONDS) {
@@ -128,17 +130,17 @@ public class PriceTrackingEngine {
 			catch(SocketException e) {
 				e.printStackTrace();
 				logger.info("restarting engine...");
-				restarter.restart();
+				restarter.restartVaccineSlotCheckEngine();
 			}
 			catch(SocketTimeoutException e) {
 				e.printStackTrace();
 				logger.info("restarting engine...");
-				restarter.restart();
+				restarter.restartVaccineSlotCheckEngine();
 			}
 			catch(Exception e) {
 				e.printStackTrace();
 				logger.info("restarting engine...");
-				restarter.restart();
+				restarter.restartVaccineSlotCheckEngine();
 			}
 
 	}

@@ -1,5 +1,10 @@
 package com.myriadtracker;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.log;
+
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,9 +25,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.mail.Authenticator;
+import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.Test;
@@ -39,11 +54,16 @@ import com.opencsv.bean.*;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.chrome.*;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import emailSender.emailSenderHelper;
 import orderTracker.trackOrders;
@@ -85,14 +105,20 @@ class priceTrackerApplicationTests {
 	}
 	
 	@Test
-	void doTasks() throws IOException, MessagingException, InterruptedException {
+	void checkSlotByPincode() throws IOException, MessagingException, InterruptedException {
 		String[] valuesNotNeeded = {"COVAXIN","COVISHIELD","Booked","NA","Age 45+","Age 18+"};
 		// Create a new instance of the Firefox driver
         // Notice that the remainder of the code relies on the interface, 
         // not the implementation.
 		System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodriver.exe");
+		
+		//System.setProperty("webdriver.chrome.driver", "src/main/resources/geckodriver.exe");
+		
         WebDriver driver = new FirefoxDriver();
-        //String response = doc.normalise().select("script#is_script").html().toString();
+        
+		//WebDriver driver = new ChromeDriver();
+		
+		//String response = doc.normalise().select("script#is_script").html().toString();
         // And now use this to visit Google
         //driver.get("http://www.google.com");
         //driver.get("https://selfregistration.cowin.gov.in");
@@ -107,17 +133,206 @@ class priceTrackerApplicationTests {
         //WebElement element = driver.findElement(By.name("q"));
         //WebElement element = driver.findElement(By.className("mat-input-element mat-form-field-autofill-control pintextbox ng-pristine ng-invalid cdk-text-field-autofill-monitored ng-touched"));
         
-        WebElement element = driver.findElement(By.id("mat-input-0"));
-
+        WebElement pincodeBar = driver.findElement(By.id("mat-input-0"));
+        
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].click();",pincodeBar);
         
 
         // Enter something to search for
-        element.sendKeys("134109");
+        pincodeBar.sendKeys("134109");
         
         driver.findElement(By.className("pin-search-btn")).click();
+        
+        WebElement ageFilter = driver.findElement(By.id("flexRadioDefault2"));
+        
+        JavascriptExecutor js1 = (JavascriptExecutor) driver;
+        js1.executeScript("arguments[0].click();",ageFilter);
+        
+        //driver.findElement(By.id("flexRadioDefault2")).click();
+        
+        //WebElement ageFilter = driver.findElement(By.id("flexRadioDefault2")).click();
 
         // Now submit the form. WebDriver will find the form for us from the element
-        element.submit();
+        //element.submit();
+
+        // Check the title of the page
+        //System.out.println("Page title is: " + driver.getTitle());
+        
+        List<WebElement> listOfCenters = driver.findElements(By.className("slot-available-wrap"));
+        logger.info("size is "+listOfCenters.size());
+        for(WebElement center : listOfCenters) {
+        	logger.info("Center Info -> "+center.getText());
+        	String textToCheck = center.getText().toString();
+        	//logger.info("text to check->"+textToCheck);
+        	String[] valuesToBeCheckedTemp = textToCheck.split("\n");
+        	System.out.println("Size is "+valuesToBeCheckedTemp.length);
+        	int totalSize = valuesToBeCheckedTemp.length;
+        	int totalOccurences = 0;
+        	totalOccurences += (countOccurencesOf(textToCheck, "Booked"))*3;
+        	totalOccurences += countOccurencesOf(textToCheck, "NA");
+        	if((totalSize-totalOccurences)!=0) {
+        		System.out.println("!!!!!!!!!!!!  VACCINE AVAILABLE  !!!!!!!!!!!!!!!!!!!!!!!");
+        	}
+        	else {
+        		System.out.println("!!!!!!!!!!!!  VACCINE NOT AVAILABLE  !!!!!!!!!!!!!!!!!!!!!!!");
+        	}
+        	
+        	//logger.info("split text-> "+center.getText().split(" ").length);
+        	
+        }
+        
+        //pincodeBar.clear();
+        //pincodeBar.sendKeys("134112");
+        //driver.findElement(By.className("pin-search-btn")).click();
+        //List<WebElement> listOfCenters2 = driver.findElements(By.className("slot-available-wrap"));
+        //logger.info("size is "+listOfCenters2.size());
+        //logger.info("size->"+driver.findElements(By.className("slot-available-wrap")).size());
+        
+        
+        //D:\geckodriver.exe
+        
+        // Google's search is rendered dynamically with JavaScript.
+        // Wait for the page to load, timeout after 10 seconds
+        (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+            public Boolean apply(WebDriver d) {
+            	//logger.info("->->"+d.findElement(By.className(className)));
+            	//d.findElements(By.className("center-name-title"));
+            	//d.findElements(By.className("slot-available-wrap"));
+            	String textToCheck;
+            	List<WebElement> listOfText = d.findElements(By.className("slot-available-wrap"));
+            	for(WebElement text: listOfText) {
+            		
+            	}
+            	//logger.info("text->->"+d.findElements(By.className("slot-available-wrap")).get(0).getText());
+            	//logger.info("->->"+d.findElements(By.className("center-name-title")));
+            	//logger.info("->->"+d.findElements(By.className("slot-available-wrap")));
+            	return d.getTitle().toLowerCase().startsWith("cheese!");
+            }
+        });
+
+        // Should see: "cheese! - Google Search"
+        System.out.println("Page title is: " + driver.getTitle());
+
+        //Close the browser
+        driver.quit();
+	}
+	
+	@Test
+	void checkSlotByDistrict() throws IOException, MessagingException, InterruptedException, AWTException {
+		/*
+		System.setProperty("webdriver.chrome.driver", "C:\\selenium\\chromedriver.exe");
+		chromeOptions options = new ChromeOptions();
+		options.setExperimentalOption("debuggerAddress", "127.0.0.1:<customPort>");
+		WebDriver driver = new ChromeDriver(options);
+		*/
+		
+		
+		// Create a new instance of the Firefox driver
+        // Notice that the remainder of the code relies on the interface, 
+        // not the implementation.
+		System.setProperty("webdriver.gecko.driver", "src/main/resources/geckodriver.exe");
+		System.setProperty("java.awt.headless", "false");
+        WebDriver driver = new FirefoxDriver();
+        driver.manage().window().maximize();
+        //Point point = new Point(300, 500);
+        //driver.manage().window().setPosition(point);
+        //String response = doc.normalise().select("script#is_script").html().toString();
+        // And now use this to visit Google
+        //driver.get("http://www.google.com");
+        //driver.get("https://selfregistration.cowin.gov.in");
+        
+        
+        driver.get("https://www.cowin.gov.in/home");
+        
+        
+        // Alternatively the same thing can be done like this
+        // driver.navigate().to("http://www.google.com");
+
+        // Find the text input element by its name
+        //WebElement element = driver.findElement(By.name("q"));
+        //WebElement element = driver.findElement(By.className("mat-input-element mat-form-field-autofill-control pintextbox ng-pristine ng-invalid cdk-text-field-autofill-monitored ng-touched"));
+        
+        WebElement element = driver.findElement(By.id("mat-input-0"));
+        
+        // to select the search-for-district toggle option
+        WebElement pinOrDistrictSelector = driver.findElement(By.id("status"));
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].click();",pinOrDistrictSelector);
+        
+        // filling in state value
+        WebElement state = driver.findElement(By.id("mat-select-0"));
+        state.sendKeys("Haryana");
+        
+        
+        // filling in district value
+        WebElement district = driver.findElement(By.id("mat-select-2"));
+        district.click();
+        district.sendKeys("Panchkula");
+        
+        /*
+        WebElement searchButton = driver.findElement(By.className("pin-search-btn"));
+        JavascriptExecutor js1 = (JavascriptExecutor) driver;
+        js1.executeScript("arguments[0].click();",searchButton);
+        */
+        driver.findElement(By.className("pin-search-btn")).click();
+        driver.findElement(By.className("pin-search-btn")).click();
+        
+        WebElement ageFilter = driver.findElement(By.id("flexRadioDefault2"));
+        JavascriptExecutor js1 = (JavascriptExecutor) driver;
+        js1.executeScript("arguments[0].click();",ageFilter);
+        
+        Robot robot = new Robot();
+
+        // Scroll Down using Robot class
+        robot.mouseWheel(12);
+        //robot.keyPress(KeyEvent.VK_PAGE_DOWN);
+        //robot.keyPress(KeyEvent.VK_PAGE_DOWN);
+        //robot.keyPress(KeyEvent.VK_PAGE_DOWN);
+        //robot.keyPress(KeyEvent.VK_PAGE_DOWN);
+        //robot.keyRelease(KeyEvent.VK_PAGE_DOWN);
+        
+        //WebElement searchButton = driver.findElement(By.cssSelector("button.pin-search-btn.district-search"));
+        /*
+        WebElement searchButton = driver.findElement(By.xpath("//button[contains(text(),'Search')]"));
+        searchButton.sendKeys(Keys.ENTER);
+        logger.info("->->"+searchButton.getLocation());
+        JavascriptExecutor js1 = (JavascriptExecutor) driver;
+        js1.executeScript("arguments[0].click();",searchButton);
+        searchButton.click();
+        */
+
+        //WebElement searchButton = driver.findElement(By.className("pin-search-btn.district-search"));
+        //driver.findElement(By.xpath("//button[contains(text(),'district')]")).click();
+        
+        /*
+        WebElement ageFilter = driver.findElement(By.id("flexRadioDefault2"));
+        JavascriptExecutor js1 = (JavascriptExecutor) driver;
+        js1.executeScript("arguments[0].click();",ageFilter);
+        */
+        //Select dropdown = new Select(driver.findElement(By.id("mat-select-0")));
+        //Select dropdown = new Select(driver.findElement(By.xpath("//mat-select[@id=\"mat-select-0\"]")));
+        
+        //Select dropdown = new Select(driver.findElement( By.xpath(xpathExpression) ));
+        
+        //dropdown.selectByValue("Haryana");
+        
+        
+        
+        //district.sendKeys("Search By District");
+        
+        
+        
+        //pinOrDistrictSelector.click();
+        //district.click();
+
+        // Enter something to search for
+        //element.sendKeys("134109");
+        
+        //driver.findElement(By.className("pin-search-btn")).click();
+
+        // Now submit the form. WebDriver will find the form for us from the element
+        //element.submit();
 
         // Check the title of the page
         //System.out.println("Page title is: " + driver.getTitle());
@@ -871,6 +1086,38 @@ class priceTrackerApplicationTests {
 		
 		String response = doc.normalise().select("script#is_script").html().toString();
 		logger.info("response is ->" + response);
+	}
+	
+	private static Properties getProperties()  {
+		Properties properties = new Properties();
+		properties.put("mail.smtp.auth", "true");
+		properties.put("mail.smtp.starttls.enable", "true");
+		properties.put("mail.smtp.host", "smtp.gmail.com");
+		properties.put("mail.smtp.port", "587");
+		return properties;
+	}
+	
+	
+	static Session session = Session.getInstance(getProperties(), new Authenticator() {
+		@Override
+		protected PasswordAuthentication getPasswordAuthentication() {
+			return new PasswordAuthentication(emailSenderHelper.getEmail(), emailSenderHelper.getPassword());
+		}
+	});
+	
+	@Test
+	public void sendMailTest() {
+		Message message = new MimeMessage(session);
+		try {
+			message.setFrom(new InternetAddress(emailSenderHelper.getEmail()));
+			message.setRecipient(Message.RecipientType.TO, new InternetAddress("arnavmalhotra338@gmail.com"));
+			message.setSubject("Order Tracker - order tracking stopped");
+			message.setText("!!!!!!!!!!!!!Order tracking has been stopped !!!");
+			Transport.send(message);
+			logger.info("!!!!!!!!!!!!!!!!!!!!!Message sent successfully!!!!!!!!!!!!!!!!!!!!!");
+		} catch (MessagingException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Test

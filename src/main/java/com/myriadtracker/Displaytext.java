@@ -1,5 +1,6 @@
 package com.myriadtracker;
 
+import java.awt.AWTException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -84,7 +85,7 @@ public class Displaytext {
 	}
 
 	@PostMapping("/checkVaccine")
-	public void startCheckingVaccine(Product product) throws IOException, MessagingException, InterruptedException {
+	public void startCheckingVaccine(Product product) throws IOException, MessagingException, InterruptedException, AWTException {
 
 		logger.info("Starting to check slots for vaccine availibility");
 
@@ -99,7 +100,7 @@ public class Displaytext {
 		finally {
 			if (restart) {
 				logger.info("error while startng to check vaccine slots...");
-				backupengine.restart();
+				backupengine.restartVaccineSlotCheckEngine();
 			}
 		}
 
